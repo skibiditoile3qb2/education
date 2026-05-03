@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>An educational website</title>
+
+  
+</head>
+<body>
+  <script>
+    //hey skid
+    if (window.location.href !== 'about:blank') {
+    const file = document.documentElement.outerHTML;
+    const newTab = window.open('about:blank');
+    newTab.document.write(file);
+    newTab.document.close();
+    }
+  </script>
+</body>
