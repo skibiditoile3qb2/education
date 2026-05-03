@@ -8,13 +8,20 @@
   
 </head>
 <body>
+  <div class="container">
+    <h1>Educational things</h1>
+    <p>Exps. to help you in school.</p>
+  </div>
   <script>
-    //hey skid
+    //hello skids
+    //about:blank is invisible to filters
+    //original tab becomes google
     if (window.location.href !== 'about:blank') {
     const file = document.documentElement.outerHTML;
     const newTab = window.open('about:blank');
     newTab.document.write(file);
     newTab.document.close();
+    window.location.href = 'google.com';
     }
   </script>
 </body>
