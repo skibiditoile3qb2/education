@@ -4,17 +4,294 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>An educational website</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  
+    :root {
+      --bg: #0a0a0a;
+      --surface-1: #111111;
+      --surface-2: #181818;
+      --surface-3: #222222;
+      --border: #2a2a2a;
+      --border-hover: #3a3a3a;
+      --text-primary: #e8e8e8;
+      --text-secondary: #888;
+      --text-muted: #444;
+      --accent: #ffffff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      padding: 0 0 80px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      padding: 64px 0 48px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px 32px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: #ffffff;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .card:hover {
+      background: var(--surface-2);
+      border-color: var(--border-hover);
+      transform: translateX(4px);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .card-arrow {
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .card:hover .card-arrow {
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+
+    .card-title {
+      margin-top: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    .card-desc {
+      margin-top: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface-2);
+      border: 1px solid var(--border-hover);
+      border-radius: 6px;
+      width: 100%;
+      max-width: 520px;
+      padding: 36px;
+      position: relative;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      width: 32px; height: 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .modal-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
+
   <div class="container">
-    <h1>Educational things</h1>
-    <p>Exps. to help you in school.</p>
+    <header>
+      <div class="eyebrow">math and stuff</div>
+      <h1>Educational things</h1>
+      <p class="subtitle">Exps. to help you in school.</p>
+    </header>
+
+    <div class="cards">
+      <div class="card" onclick="openModal(0)">
+        <div class="card-header"><span class="card-num">01</span><span class="card-arrow">→</span></div>
+        <div class="card-title">Topic One</div>
+        <div class="card-desc">Short description here</div>
+      </div>
+      <div class="card" onclick="openModal(1)">
+        <div class="card-header"><span class="card-num">02</span><span class="card-arrow">→</span></div>
+        <div class="card-title">Topic Two</div>
+        <div class="card-desc">Short description here</div>
+      </div>
+      <div class="card" onclick="openModal(2)">
+        <div class="card-header"><span class="card-num">03</span><span class="card-arrow">→</span></div>
+        <div class="card-title">Topic Three</div>
+        <div class="card-desc">Short description here</div>
+      </div>
+      <div class="card" onclick="openModal(3)">
+        <div class="card-header"><span class="card-num">04</span><span class="card-arrow">→</span></div>
+        <div class="card-title">Topic Four</div>
+        <div class="card-desc">Short description here</div>
+      </div>
+      <div class="card" onclick="openModal(4)">
+        <div class="card-header"><span class="card-num">05</span><span class="card-arrow">→</span></div>
+        <div class="card-title">Topic Five</div>
+        <div class="card-desc">Short description here</div>
+      </div>
+      <div class="card" onclick="openModal(5)">
+        <div class="card-header"><span class="card-num">06</span><span class="card-arrow">→</span></div>
+        <div class="card-title">Topic Six</div>
+        <div class="card-desc">Short description here</div>
+      </div>
+    </div>
   </div>
+
+  <div class="modal-overlay" id="modal" onclick="closeOnOverlay(event)">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-eyebrow" id="modal-num"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-divider"></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
   <script>
     //hello skids
-    //about:blank is invis.
+    //about:blank is invisible
     //original tab becomes google
     if (window.location.href !== 'about:blank') {
     const file = document.documentElement.outerHTML;
@@ -23,5 +300,34 @@
     newTab.document.close();
     window.location.href = 'https://google.com';
     }
+    const data = [
+      { title: "Topic One",   body: "Your content here. Explain how to do the thing for topic one." },
+      { title: "Topic Two",   body: "Your content here. Explain how to do the thing for topic two." },
+      { title: "Topic Three", body: "Your content here. Explain how to do the thing for topic three." },
+      { title: "Topic Four",  body: "Your content here. Explain how to do the thing for topic four." },
+      { title: "Topic Five",  body: "Your content here. Explain how to do the thing for topic five." },
+      { title: "Topic Six",   body: "Your content here. Explain how to do the thing for topic six." },
+    ];
+
+    function openModal(i) {
+      document.getElementById('modal-num').textContent = '// 0' + (i+1);
+      document.getElementById('modal-title').textContent = data[i].title;
+      document.getElementById('modal-body').textContent = data[i].body;
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('open');
+    }
+
+    function closeOnOverlay(e) {
+      if (e.target === document.getElementById('modal')) closeModal();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
   </script>
 </body>
+</html>
+
