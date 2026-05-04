@@ -293,21 +293,24 @@
     //hello skids
     //about:blank is invisible
     //original tab becomes google
-    if (window.location.href !== 'about:blank') {
-    const file = document.documentElement.outerHTML;
-    const newTab = window.open('about:blank');
-    newTab.document.write(file);
-    newTab.document.close();
-    window.location.href = 'https://google.com';
-    }
     const data = [
-      { title: "Topic One",   body: "Your content here. Explain how to do the thing for topic one." },
-      { title: "Topic Two",   body: "Your content here. Explain how to do the thing for topic two." },
-      { title: "Topic Three", body: "Your content here. Explain how to do the thing for topic three." },
-      { title: "Topic Four",  body: "Your content here. Explain how to do the thing for topic four." },
-      { title: "Topic Five",  body: "Your content here. Explain how to do the thing for topic five." },
-      { title: "Topic Six",   body: "Your content here. Explain how to do the thing for topic six." },
+      { title: "Topic One",   body: "Your content here." },
+      { title: "Topic Two",   body: "Your content here." },
+      { title: "Topic Three", body: "Your content here." },
+      { title: "Topic Four",  body: "Your content here." },
+      { title: "Topic Five",  body: "Your content here." },
+      { title: "Topic Six",   body: "Your content here." },
     ];
+    
+    if (window.location.href !== 'about:blank') {
+      const file = document.documentElement.outerHTML;
+      const newTab = window.open('about:blank');
+      if (newTab) {
+        newTab.document.write(file);
+        newTab.document.close();
+        window.location.href = 'https://google.com';
+      }
+    }
 
     function openModal(i) {
       document.getElementById('modal-num').textContent = '// 0' + (i+1);
