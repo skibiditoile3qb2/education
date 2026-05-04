@@ -319,13 +319,14 @@
 ];
  
 document.getElementById('overlay').style.display = 'flex';
+
 function launch() {
   const newTab = window.open('about:blank');
   if (newTab) {
     newTab.document.write(
       document.documentElement.outerHTML.replace(
-        "overlay.style.display = 'flex';",
-        "// hidden in new tab"
+        "document.getElementById('overlay').style.display = 'flex';",
+        "// launched"
       )
     );
     newTab.document.close();
