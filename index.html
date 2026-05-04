@@ -288,49 +288,72 @@
       <div class="modal-body" id="modal-body"></div>
     </div>
   </div>
+  <div id="overlay" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #0a0a0a;
+  z-index: 9999;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+" onclick="launch()">
+  <div style="font-family: 'Syne', sans-serif; font-size: clamp(40px, 10vw, 80px); font-weight: 800; color: #e8e8e8; letter-spacing: -0.03em;">Press me</div>
+  <div style="font-family: 'Space Mono', monospace; font-size: 13px; color: #555;">click anywhere</div>
+</div>
 
   <script>
     //hello skids
     //about:blank is invisible
     //original tab becomes google
+    //has to use user input to stop stupid popup blockers
     const data = [
-      { title: "Topic One",   body: "Your content here." },
-      { title: "Topic Two",   body: "Your content here." },
-      { title: "Topic Three", body: "Your content here." },
-      { title: "Topic Four",  body: "Your content here." },
-      { title: "Topic Five",  body: "Your content here." },
-      { title: "Topic Six",   body: "Your content here." },
-    ];
-    
-    if (window.location.href !== 'about:blank') {
-      const file = document.documentElement.outerHTML;
-      const newTab = window.open('about:blank');
-      if (newTab) {
-        newTab.document.write(file);
-        newTab.document.close();
-        window.location.href = 'https://google.com';
-      }
-    }
+  { title: "Topic One",   body: "Your content here." },
+  { title: "Topic Two",   body: "Your content here." },
+  { title: "Topic Three", body: "Your content here." },
+  { title: "Topic Four",  body: "Your content here." },
+  { title: "Topic Five",  body: "Your content here." },
+  { title: "Topic Six",   body: "Your content here." },
+];
 
-    function openModal(i) {
-      document.getElementById('modal-num').textContent = '// 0' + (i+1);
-      document.getElementById('modal-title').textContent = data[i].title;
-      document.getElementById('modal-body').textContent = data[i].body;
-      document.getElementById('modal').classList.add('open');
-    }
+// show the overlay if not about:blank
+if (window.location.href !== 'about:blank') {
+  const overlay = document.getElementById('overlay');
+  overlay.style.display = 'flex';
+}
 
-    function closeModal() {
-      document.getElementById('modal').classList.remove('open');
-    }
+function launch() {
+  const file = document.documentElement.outerHTML;
+  const newTab = window.open('about:blank');
+  if (newTab) {
+    newTab.document.write(file);
+    newTab.document.close();
+    window.location.href = 'https://google.com';
+  }
+}
 
-    function closeOnOverlay(e) {
-      if (e.target === document.getElementById('modal')) closeModal();
-    }
+function openModal(i) {
+  document.getElementById('modal-num').textContent = '// 0' + (i+1);
+  document.getElementById('modal-title').textContent = data[i].title;
+  document.getElementById('modal-body').textContent = data[i].body;
+  document.getElementById('modal').classList.add('open');
+}
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeModal();
-    });
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function closeOnOverlay(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
   </script>
+  
 </body>
 </html>
 
