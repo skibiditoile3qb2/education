@@ -317,13 +317,12 @@
   { title: "Topic Five",  body: "Your content here." },
   { title: "Topic Six",   body: "Your content here." },
 ];
-
+ 
+ const overlay = document.getElementById('overlay');
 // show the overlay if not about:blank
 if (window.location.href !== 'about:blank') {
-  const overlay = document.getElementById('overlay');
   overlay.style.display = 'flex';
-}
-
+} else { overlay.style.display = 'none';}
 function launch() {
   const file = document.documentElement.outerHTML;
   const newTab = window.open('about:blank');
