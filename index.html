@@ -318,16 +318,16 @@
   { title: "Topic Six",   body: "Your content here." },
 ];
  
- const overlay = document.getElementById('overlay');
-// show the overlay if not about:blank
-if (window.location.href !== 'about:blank') {
-  overlay.style.display = 'flex';
-} else { overlay.style.display = 'none';}
+document.getElementById('overlay').style.display = 'flex';
 function launch() {
-  const file = document.documentElement.outerHTML;
   const newTab = window.open('about:blank');
   if (newTab) {
-    newTab.document.write(file);
+    newTab.document.write(
+      document.documentElement.outerHTML.replace(
+        "overlay.style.display = 'flex';",
+        "// hidden in new tab"
+      )
+    );
     newTab.document.close();
     window.location.href = 'https://google.com';
   }
